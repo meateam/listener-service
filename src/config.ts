@@ -1,5 +1,5 @@
-export const mongoConnectionString: string = process.env.MONGO_HOST || 'mongodb://localhost:27017/devDB';
-export const rabbitURI: string = process.env.RABBIT_HOST || 'amqp://localhosta';
+export const mongoConnectionString: string = process.env.MONGO_HOST || 'mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019/devDB?replicaSet=rs0';
+export const rabbitURI: string = process.env.RABBIT_HOST || 'amqp://localhost';
 
 export const colToQueueArray: ColToQueue[] = [
   {
@@ -18,6 +18,9 @@ export type ColToQueue = {
 };
 
 // Logger-Related configs
+
+// Whether or not to use elastic for the logger.
+export const useElastic : boolean = process.env.ELASTICSEARCH_URL !== '';
 
 const esHost: string = process.env.ELASTICSEARCH_URL || 'http://localhost:9200';
 const esUser: string = process.env.ELASTICSEARCH_USER || '';

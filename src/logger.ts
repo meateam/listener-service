@@ -1,7 +1,7 @@
 import * as winston from 'winston';
 import * as os from 'os';
 import * as Elasticsearch from 'winston-elasticsearch';
-import { confLogger, debugMode } from './config';
+import { confLogger, debugMode, useElastic } from './config';
 // index pattern for the logger
 const indexTemplateMapping = require('winston-elasticsearch/index-template-mapping.json');
 indexTemplateMapping.index_patterns = `${confLogger.indexPrefix}-*`;
@@ -13,16 +13,23 @@ export const logger: winston.Logger = winston.createLogger({
 });
 
 // configure logger
-const elasticsearch = new Elasticsearch.default({
-  indexPrefix: confLogger.indexPrefix,
-  level: 'verbose',
-  clientOpts: confLogger.options,
-  bufferLimit: 100,
-  messageType: 'log',
-  ensureMappingTemplate: true,
-  mappingTemplate: indexTemplateMapping,
-});
-logger.add(elasticsearch);
+if(useElastic) {
+  const elasticsearch = new Elasticsearch.default({
+    indexPrefix: confLogger.indexPrefix,
+    level: 'verbose',
+    clientOpts: confLogger.options,
+    bufferLimit: 100,
+    messageType: 'log',
+    ensureMappingTemplate: true,
+    mappingTemplate: indexTemplateMapping,
+  });
+  logger.add(elasticsearch);
+}
+
+if (debugMode) {
+  const consoleLogger = new winston.transports.Console();
+  logger.add(consoleLogger);
+}
 
 /**
  * logs the data with its given parameters.
@@ -34,17 +41,6 @@ logger.add(elasticsearch);
  * @param meta - additional optional information.
  */
 export const log = (level: Severity, message: string, name: string, traceID?: string, meta?: object) => {
-  // Console logs for debugging only.
-  if (debugMode) {
-    if (traceID) {
-      console.log(`level: ${level}, message: ${message}, name: ${name}, traceID: ${traceID}, meta:`);
-    } else {
-      console.log(`level: ${level}, message: ${message}, name: ${name}, meta:`);
-    }
-    if (meta) {
-      console.log(meta);
-    }
-  }
   logger.log(level, message, { ...meta, traceID, method: name });
 };
 

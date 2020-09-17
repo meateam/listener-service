@@ -11,7 +11,7 @@ function initApp() {
   app.use(router);
   app.set('port', port);
   http.createServer(app).listen(app.get('port'), () => {
-    console.log(`Express server listening on port ${app.get('port')}`);
+    log(Severity.INFO, `Express server listening on port ${app.get('port')}`, 'initApp');
   });
 }
 
@@ -32,7 +32,7 @@ async function initWatchAndNotify() : Promise<void> {
     try {
       await mtr.watchAndNotify(mongoData, rabbitData);
     } catch (err) {
-      log(Severity.ERROR, `error while connectiong to MTR: ${err}`, 'mtr.watchAndNotify');
+      log(Severity.ERROR, `error while connecting to MTR for colQCouple: ${JSON.stringify(colQCouple)} : ${err}`, 'mtr.watchAndNotify');
       return;
     }
   }

@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && npm run serve",
-    "serve": "node dist/index.js"
+    "serve": "node dist/index.js",
+    "build-ts": "tsc"
   },
   "repository": {
     "type": "git",
