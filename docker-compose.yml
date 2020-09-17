@@ -1,0 +1,48 @@
+version: "3"
+services:
+  listener-service:
+    build: .
+    environment:
+      DEBUG_MODE: 'true'
+      RABBIT_HOST: 'amqp://rabbitmq'
+      MONGO_HOST: 'mongodb://mongo1:27017,mongo2:27017,mongo3:27017/devDB?replicaSet=rs0'
+    ports: 
+      - 3000:3000
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+      - rabbitmq
+  rabbitmq:
+      image: rabbitmq:3-management-alpine
+      container_name: rabbitmq
+      ports:
+          - 5672:5672
+          - 15672:15672
+  # The mongo replicaSet. to initiate, run rs.initiate() on one of the containers.
+  # To run the service locally, run `sudo nano /etc/hosts` and add mongo1,2,3 as localhost 
+  mongo1:
+    hostname: mongo1
+    container_name: mongo1
+    image: mongo:4.0-xenial
+    ports:
+      - 27017:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  mongo2:
+    hostname: mongo2
+    container_name: mongo2
+    image: mongo:4.0-xenial
+    ports:
+    - 27018:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  mongo3:
+    hostname: mongo3
+    container_name: mongo3
+    image: mongo:4.0-xenial
+    ports:
+    - 27019:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
