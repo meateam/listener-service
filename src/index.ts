@@ -21,7 +21,6 @@ async function initWatchAndNotify() : Promise<void> {
     const mongoData: MongoDataType = {
       collectionName: colQCouple.collection,
       connectionString: mongoConnectionString,
-      prettify: false
     };
 
     const rabbitData: RabbitDataType = {

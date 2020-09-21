@@ -20,7 +20,8 @@ export type ColToQueue = {
 // Logger-Related configs
 
 // Whether or not to use elastic for the logger.
-export const useElastic : boolean = process.env.ELASTICSEARCH_URL !== '';
+export const useElastic : boolean = process.env.ELASTICSEARCH_URL != undefined;
+console.log(` process.env.ELASTICSEARCH_URL : ${process.env.ELASTICSEARCH_URL}, useElastic: ${useElastic}`);
 
 const esHost: string = process.env.ELASTICSEARCH_URL || 'http://localhost:9200';
 const esUser: string = process.env.ELASTICSEARCH_USER || '';
