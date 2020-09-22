@@ -14,11 +14,11 @@ services:
       - mongo3
       - rabbitmq
   rabbitmq:
-      image: rabbitmq:3-management-alpine
-      container_name: rabbitmq
-      ports:
-          - 5672:5672
-          - 15672:15672
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
   # The mongo replicaSet. to initiate, run rs.initiate() on one of the containers.
   # To run the service locally, run `sudo nano /etc/hosts` and add mongo1,2,3 as localhost 
   mongo1:
@@ -34,7 +34,7 @@ services:
     container_name: mongo2
     image: mongo:4.0-xenial
     ports:
-    - 27018:27017
+      - 27018:27017
     restart: always
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
   mongo3:
@@ -42,7 +42,7 @@ services:
     container_name: mongo3
     image: mongo:4.0-xenial
     ports:
-    - 27019:27017
+      - 27019:27017
     restart: always
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 

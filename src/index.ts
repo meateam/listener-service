@@ -1,10 +1,10 @@
-import * as mtr from 'mongo-to-rabbit';
 import express from 'express';
 import * as http from 'http';
-import { router } from './router';
-import { colToQueueArray, mongoConnectionString, rabbitURI, port } from './config';
+import * as mtr from 'mongo-to-rabbit';
 import { MongoDataType, RabbitDataType } from 'mongo-to-rabbit/lib/paramTypes';
+import { colToQueueArray, mongoConnectionString, rabbitURI, port } from './config';
 import { log, Severity } from './logger';
+import { router } from './router';
 
 function initApp() {
   const app : express.Application = express();
@@ -15,6 +15,11 @@ function initApp() {
   });
 }
 
+/**
+ * initWatchAndNotify initiates the mongo watchers and rabbit queues,
+ * using the mongo-to-rabbit (mtr) package.
+ * The queues are taken from the colToQueueArray in the config file.
+ */
 async function initWatchAndNotify() : Promise<void> {
   for (const colQCouple of colToQueueArray) {
 
@@ -29,7 +34,7 @@ async function initWatchAndNotify() : Promise<void> {
     };
 
     try {
-      await mtr.watchAndNotify(mongoData, rabbitData);
+      await mtr.watchAndNotify(mongoData, rabbitData, { silent: false });
     } catch (err) {
       log(Severity.ERROR, `error while connecting to MTR for colQCouple: ${JSON.stringify(colQCouple)} : ${err}`, 'mtr.watchAndNotify');
       return;

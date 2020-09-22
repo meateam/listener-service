@@ -1,20 +1,15 @@
 import * as winston from 'winston';
 import * as os from 'os';
-import * as Elasticsearch from 'winston-elasticsearch';
-import { confLogger, debugMode, useElastic } from './config';
-// index pattern for the logger
-const indexTemplateMapping = require('winston-elasticsearch/index-template-mapping.json');
-indexTemplateMapping.index_patterns = `${confLogger.indexPrefix}-*`;
-
-const serviceName: string = 'listener-service';
+import * as elasticsearch from 'winston-elasticsearch';
+import { confLogger, debugMode, useElastic, indexTemplateMapping, serviceName } from './config';
 
 export const logger: winston.Logger = winston.createLogger({
   defaultMeta: { service: serviceName, hostname: os.hostname() },
 });
 
 // configure logger
-if(useElastic) {
-  const elasticsearch = new Elasticsearch.default({
+if (useElastic) {
+  const es = new elasticsearch.default({
     indexPrefix: confLogger.indexPrefix,
     level: 'verbose',
     clientOpts: confLogger.options,
@@ -23,7 +18,7 @@ if(useElastic) {
     ensureMappingTemplate: true,
     mappingTemplate: indexTemplateMapping,
   });
-  logger.add(elasticsearch);
+  logger.add(es);
 }
 
 if (debugMode) {

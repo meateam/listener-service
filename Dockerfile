@@ -3,9 +3,8 @@ FROM node:10.16.0-alpine AS builder
 WORKDIR /usr/src/app
 COPY ["package.json", "package-lock.json*", "./"]
 RUN npm install --silent && cp -r node_modules ../
-RUN npm install -g typescript
 COPY . .
-RUN npm run build-ts
+RUN npm run build
 
 FROM node:10.16.0-alpine
 COPY --from=builder /usr/src/app/package.json /usr/src/app/package-lock.json ./

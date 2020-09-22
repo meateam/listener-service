@@ -17,11 +17,12 @@ export type ColToQueue = {
   queue: string;
 };
 
-// Logger-Related configs
+// ********************************************************************************************************* //
+// **************************************** LOGGER-RELATED CONFIGS  **************************************** //
+// ********************************************************************************************************* //
 
 // Whether or not to use elastic for the logger.
-export const useElastic : boolean = process.env.ELASTICSEARCH_URL != undefined;
-console.log(` process.env.ELASTICSEARCH_URL : ${process.env.ELASTICSEARCH_URL}, useElastic: ${useElastic}`);
+export let useElastic : boolean = process.env.ELASTICSEARCH_URL !== undefined;
 
 const esHost: string = process.env.ELASTICSEARCH_URL || 'http://localhost:9200';
 const esUser: string = process.env.ELASTICSEARCH_USER || '';
@@ -29,13 +30,18 @@ const esPass: string = process.env.ELASTICSEARCH_PASSWORD || '';
 export const confLogger = {
   options: {
     hosts: esHost && esHost.split(','),
-    // Might be auth instead, not sure.
     httpAuth: `${esUser}:${esPass}`,
   },
   indexPrefix: process.env.LOG_INDEX || 'kdrive',
 };
 
 export const debugMode: boolean = process.env.DEBUG_MODE === 'true';
+
+// index pattern for the logger
+export const indexTemplateMapping = require('winston-elasticsearch/index-template-mapping.json');
+indexTemplateMapping.index_patterns = `${confLogger.indexPrefix}-*`;
+
+export const serviceName: string = 'listener-service';
 
 // Router
 export const port : string = process.env.PORT || '3000';
