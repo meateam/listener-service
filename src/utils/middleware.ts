@@ -27,9 +27,9 @@ enum ObjectType {
 
 function concludeObjectType(type: string) {
     switch(type) {
-        case 'file':
+        case 'files':
             return ObjectType.FILE;
-        case 'permission':
+        case 'permissions':
             return ObjectType.PERMISSION;
         default:
             return ObjectType.NONE;

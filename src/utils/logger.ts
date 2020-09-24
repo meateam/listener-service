@@ -1,7 +1,7 @@
 import * as winston from 'winston';
 import * as os from 'os';
 import * as elasticsearch from 'winston-elasticsearch';
-import { confLogger, debugMode, useElastic, indexTemplateMapping, serviceName } from './config';
+import { confLogger, debugMode, useElastic, indexTemplateMapping, serviceName } from '../config';
 
 export const logger: winston.Logger = winston.createLogger({
   defaultMeta: { service: serviceName, hostname: os.hostname() },
