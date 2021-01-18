@@ -1,17 +1,19 @@
+import config from '../config';
+
 /**
- * Object types
+ * Mongo object types
  */
 export enum ObjectType {
     FILE = 'FILE',
     PERMISSION = 'PERMISSION',
     NONE = 'NONE',
-  }
+}
 
 export function concludeObjectType(type: string) {
   switch (type) {
-    case 'files':
+    case config.collections.file:
       return ObjectType.FILE;
-    case 'permissions':
+    case config.collections.premission:
       return ObjectType.PERMISSION;
     default:
       return ObjectType.NONE;
@@ -21,19 +23,27 @@ export function concludeObjectType(type: string) {
 /**
  * Mongo operations types
  */
+// TODO: make custom operation not mongo
 export enum OperationType {
-  ADD = 'ADD',
-  UPDATE = 'UPDATE',
-  DELETE = 'DELETE',
-  NONE = 'NONE',
-}
+    CREATE = 'CREATE',
+    UPDATE = 'UPDATE',
+    DELETE = 'DELETE',
+    CHANGE = 'CHANGE',
+    REPLACE = 'REPLACE',
+    METADATA_CHANGE = 'METADATA_CHANGE',
+    CONTENT_CHANGE = 'CONTENT_CHANGE',
+    SHARE_CREATED = 'SHARE_CREATED',
+    NONE = 'NONE',
+  }
 
 export function concludeOperation(type: string) {
   switch (type) {
     case 'insert':
-      return OperationType.ADD;
+      return OperationType.CREATE;
     case 'update':
       return OperationType.UPDATE;
+    case 'replace':
+      return OperationType.REPLACE;
     case 'delete':
       return OperationType.DELETE;
     default:
