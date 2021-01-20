@@ -1,4 +1,4 @@
-import { concludeObjectType, concludeOperation, OperationType } from '../../collectionProducer/collectionProducer.enum';
+import { concludeObjectType, concludeMongoOperation, OperationType } from '../../collectionProducer/collectionProducer.enum';
 import { DataObjectType } from '../../mongo-rabbit/src/paramTypes';
 import { DefaultResponse, FileResponse } from '../collectionResponse.interface';
 
@@ -11,6 +11,7 @@ export interface PermissionDoc {
   creator: string;
   role: number;
 }
+
 
 export function permissionIndexParser(data: DataObjectType, collection: string): FileResponse {
   const permissionDoc: PermissionDoc = <PermissionDoc>data.fullDocument;
@@ -27,20 +28,18 @@ export function permissionIndexParser(data: DataObjectType, collection: string):
 
 export function permissionHiParser(data: DataObjectType, collection: string): DefaultResponse | undefined {
   const permissionDoc: PermissionDoc = <PermissionDoc>data.fullDocument;
-  let operation = concludeOperation(data.operation);
-  if (operation === OperationType.CREATE) {
-    if (permissionDoc.creator !== permissionDoc.userID) {
-      operation = OperationType.SHARE_CREATED;
+  let operation: OperationType = concludeMongoOperation(data.operation);
+  if (operation === OperationType.CREATE &&
+    permissionDoc.creator !== permissionDoc.userID) {
+    operation = OperationType.SHARE_CREATED;
 
-      const formattedData: DefaultResponse = new DefaultResponse({
-        objectType:   concludeObjectType(collection),
-        operationType: operation,
-        data: permissionDoc,
-      });
+    const formattedData: DefaultResponse = new DefaultResponse({
+      objectType:   concludeObjectType(collection),
+      operationType: operation,
+      data: permissionDoc,
+    });
 
-      console.log(formattedData);
-      return formattedData;
-    }
+    return formattedData;
   }
 
   return;

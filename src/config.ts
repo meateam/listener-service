@@ -9,15 +9,16 @@ const esPass = env.get('ELASTICSEARCH_PASSWORD').default('');
 
 const config = {
   service: {
-    port: env.get('PORT').default(8080).asPortNumber(),
+    port: env.get('LSNR_PORT').default(8080).asPortNumber(),
+    host: env.get('LSNR_HOST').default('0.0.0.0').asString(),
     name: env.get('LSNR_SERVICE_NAME').default('listener-service').asString(),
-    debugMode: env.get('DEBUG_MODE').default(1).asBool(),
+    debugMode: env.get('LSNR_DEBUG_MODE').default(1).asBool(), // TODO: change to prod
   },
   mongo: {
     uri: env.get('MONGO_HOST').default('mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019/devDB?replicaSet=rs0').asString()
   },
   rabbit: {
-    url: env.get('RABBIT_HOST').default('amqp://localhost').asString()
+    url: env.get('LSNR_RABBIT_HOST').default('amqp://localhost').asString()
   },
   elasticsearch: {
     esHost,
@@ -43,27 +44,33 @@ const config = {
     indexPrefix: process.env.LOG_INDEX || 'kdrive',
   },
   collections: {
-    file: env.get('FILE_COLLECTION').default('files').asString(),
-    premission:  env.get('PERMISSION_COLLECTION').default('permissions').asString()
+    file: env.get('LSNR_FILE_COLLECTION').default('files').asString(),
+    premission:  env.get('LSNR_PERMISSION_COLLECTION').default('permissions').asString()
   },
   queues: {
-    IndexQueue: env.get('INDEX_QUEUE').default('indexQueue').asString(),
-    hiQueue: env.get('HI_QUEUE').default('hiQueue').asString()
+    IndexQueue: env.get('LSNR_INDEX_QUEUE').default('indexQueue').asString(),
+    hiQueue: env.get('LSNR_HI_QUEUE').default('hiQueue').asString()
   }
 };
 
 export let collectionProducers = {
   file: new CollectionProducer({
     collection: config.collections.file,
-    rabbitmqUrl: config.rabbit.url,
-    queues: [{ name: config.queues.IndexQueue, middleware: fileIndexParser }],
+    queues: [
+      { name: config.queues.IndexQueue,
+        middleware: fileIndexParser,
+      }
+    ],
   }),
   permission: new CollectionProducer({
     collection: config.collections.premission,
-    rabbitmqUrl: config.rabbit.url,
     queues: [
-      { name: config.queues.IndexQueue, middleware: permissionIndexParser },
-      { name: config.queues.hiQueue, middleware: permissionHiParser }
+      { name: config.queues.IndexQueue,
+        middleware: permissionIndexParser,
+      },
+      { name: config.queues.hiQueue,
+        middleware: permissionHiParser,
+      }
     ],
   })
 };

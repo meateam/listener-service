@@ -1,4 +1,4 @@
-import { concludeOperation, concludeObjectType } from '../../collectionProducer/collectionProducer.enum';
+import { concludeMongoOperation, concludeObjectType } from '../../collectionProducer/collectionProducer.enum';
 import { DataObjectType } from '../../mongo-rabbit/src/paramTypes';
 import { DefaultResponse } from '../collectionResponse.interface';
 
@@ -6,7 +6,7 @@ export default function defaultParser(data: DataObjectType, collection: string) 
   const formattedData: DefaultResponse = new DefaultResponse(
     { data,
       objectType: concludeObjectType(collection),
-      operationType: concludeOperation(data.operation),
+      operationType: concludeMongoOperation(data.operation),
     });
 
   return formattedData;

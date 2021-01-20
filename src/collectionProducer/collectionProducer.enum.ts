@@ -21,22 +21,21 @@ export function concludeObjectType(type: string) {
 }
 
 /**
- * Mongo operations types
+ *  Operations types
  */
-// TODO: make custom operation not mongo
 export enum OperationType {
     CREATE = 'CREATE',
     UPDATE = 'UPDATE',
     DELETE = 'DELETE',
     CHANGE = 'CHANGE',
-    REPLACE = 'REPLACE',
+    REPLACE = 'REPLACE', 
     METADATA_CHANGE = 'METADATA_CHANGE',
     CONTENT_CHANGE = 'CONTENT_CHANGE',
     SHARE_CREATED = 'SHARE_CREATED',
     NONE = 'NONE',
   }
 
-export function concludeOperation(type: string) {
+export function concludeMongoOperation(type: string) {
   switch (type) {
     case 'insert':
       return OperationType.CREATE;

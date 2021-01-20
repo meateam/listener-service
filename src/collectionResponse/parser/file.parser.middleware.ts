@@ -1,11 +1,11 @@
-import { concludeObjectType, concludeOperation, OperationType } from '../../collectionProducer/collectionProducer.enum';
+import { concludeObjectType, concludeMongoOperation, OperationType } from '../../collectionProducer/collectionProducer.enum';
 import { DataObjectType } from '../../mongo-rabbit/src/paramTypes';
 import { FileResponse } from '../collectionResponse.interface';
 
 // TODO: add document structure
 
 export function fileIndexParser(data: DataObjectType, collection: string): FileResponse | FileResponse[] {
-  const operation = concludeOperation(data.operation);
+  const operation = concludeMongoOperation(data.operation);
 
   if (operation === OperationType.UPDATE) {
     let responses: FileResponse[] = [];

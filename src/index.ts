@@ -1,8 +1,9 @@
 import apm from 'elastic-apm-node';
 import config from './config';
-import { initWatchAndNotify } from './collectionProducer/collectionProducer.service';
-import { Server } from './server';
-import { log, Severity } from './utils/logger';
+import ListenerServer from './server';
+import { getMongoHealth, getRabbitHealth,
+  initWatchAndNotify } from './collectionProducer/collectionProducer.service';
+import { HealthCheckResponse } from 'grpc-ts-health-check';
 
 (async () => {
   apm.start({
@@ -12,13 +13,16 @@ import { log, Severity } from './utils/logger';
     serverUrl: config.apmConfig.apmURL,
   });
 
-  // initiate watchAndNotify for each colQCouple.
+  // Initiate watchAndNotify for each producer.
   await initWatchAndNotify();
 
-  // initiate express app with router
-  const server: Server = Server.boostrap();
+  // Initiate grpc server
+  const listenerServer: ListenerServer = ListenerServer.boostrap();
 
-  server.app.on('close', () => {
-    log(Severity.INFO, 'Server closed', 'Server');
-  });
+  // Check health interval (of rabbit and mongo)
+  setInterval(() => {
+    getRabbitHealth() && getMongoHealth() ?
+    listenerServer.setHealthStatus(HealthCheckResponse.ServingStatus.SERVING) :
+    listenerServer.setHealthStatus(HealthCheckResponse.ServingStatus.NOT_SERVING);
+  },          10000);
 })();
