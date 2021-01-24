@@ -19,12 +19,13 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+
   # The mongo replicaSet. to initiate, run rs.initiate() on one of the containers.
   # To run the service locally, run `sudo nano /etc/hosts` and add mongo1,2,3 as localhost 
   mongo1:
     hostname: mongo1
     container_name: mongo1
-    image: mongo:4.0-xenial
+    image: mongo:4.4
     ports:
       - 27017:27017
     restart: always
@@ -32,7 +33,7 @@ services:
   mongo2:
     hostname: mongo2
     container_name: mongo2
-    image: mongo:4.0-xenial
+    image: mongo:4.4
     ports:
       - 27018:27017
     restart: always
@@ -40,7 +41,7 @@ services:
   mongo3:
     hostname: mongo3
     container_name: mongo3
-    image: mongo:4.0-xenial
+    image: mongo:4.4
     ports:
       - 27019:27017
     restart: always

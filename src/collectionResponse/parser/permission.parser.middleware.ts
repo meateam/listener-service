@@ -10,8 +10,9 @@ export interface PermissionDoc {
   appID: string;
   creator: string;
   role: number;
+  created_at: string;
+  updated_at: string;
 }
-
 
 export function permissionIndexParser(data: DataObjectType, collection: string): FileResponse {
   const permissionDoc: PermissionDoc = <PermissionDoc>data.fullDocument;
