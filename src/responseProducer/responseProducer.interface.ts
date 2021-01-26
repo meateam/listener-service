@@ -1,23 +1,20 @@
-import { Dictionary } from '../utils/types';
 import { ObjectType, OperationType } from '../collectionProducer/collectionProducer.enum';
 
 /**
  * Default response
  */
 export interface IDefaultResponse {
-  objectType: ObjectType;
-  operationType: OperationType;
+  event: OperationType;
+  object?: ObjectType;
   data?: any;
 }
 
 export class DefaultResponse implements IDefaultResponse {
-  objectType: ObjectType;
-  operationType: OperationType;
+  event: OperationType;
   data?: any;
 
   constructor(pushObject: IDefaultResponse) {
-    this.objectType = pushObject.objectType;
-    this.operationType = pushObject.operationType;
+    this.event = pushObject.event;
     if (pushObject.data) this.data = pushObject.data;
   }
 }

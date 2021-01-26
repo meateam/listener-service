@@ -1,7 +1,8 @@
 import * as env from 'env-var';
 import { CollectionProducer } from './collectionProducer/collectionProducer.interface';
-import { fileIndexParser } from './collectionResponse/parser/file.parser.middleware';
-import { permissionHiParser, permissionIndexParser } from './collectionResponse/parser/permission.parser.middleware';
+import { fileIndexParser } from './responseProducer/parser/file.parser.middleware';
+import { permissionHiParser, permissionIndexParser } from './responseProducer/parser/permission.parser.middleware';
+import { queueObjectType } from './mongo-rabbit/src/paramTypes';
 
 const esHost = env.get('ELASTICSEARCH_URL').default('http://localhost:9200').asString();
 const esUser = env.get('ELASTICSEARCH_USER').default('');
@@ -48,26 +49,33 @@ const config = {
     premission:  env.get('LSNR_PERMISSION_COLLECTION').default('permissions').asString()
   },
   queues: {
-    IndexQueue: env.get('LSNR_INDEX_QUEUE').default('indexQueue').asString(),
+    IndexQueue: {
+      name: env.get('LSNR_INDEX_QUEUE').default('events').asString(),
+      exchange: env.get('LSNR_INDEX_QUEUE_EXCHANGE').default('indexService').asString(),
+      routingKey: env.get('LSNR_INDEX_QUEUE_ROUTING_KEY').default('eventsKey').asString(),
+    },
     hiQueue: env.get('LSNR_HI_QUEUE').default('hiQueue').asString()
   }
+};
+
+export const indexqueue: queueObjectType =  {
+  name: config.queues.IndexQueue.name,
+  exchange: {
+    name:config.queues.IndexQueue.exchange,
+    type: 'direct',
+    routingKey: config.queues.IndexQueue.routingKey
+  },
 };
 
 export let collectionProducers = {
   file: new CollectionProducer({
     collection: config.collections.file,
-    queues: [
-      { name: config.queues.IndexQueue,
-        middleware: fileIndexParser,
-      }
-    ],
+    queues: [Object.assign({}, indexqueue, { middleware: fileIndexParser })],
   }),
   permission: new CollectionProducer({
     collection: config.collections.premission,
     queues: [
-      { name: config.queues.IndexQueue,
-        middleware: permissionIndexParser,
-      },
+      Object.assign({}, indexqueue, { middleware: permissionIndexParser }),
       { name: config.queues.hiQueue,
         middleware: permissionHiParser,
       }
