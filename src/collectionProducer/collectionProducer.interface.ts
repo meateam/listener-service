@@ -1,11 +1,11 @@
-import { queueObjectType } from '../mongo-rabbit/src/paramTypes';
+import { QueueObjectType } from '../mongo-rabbit/src/paramTypes';
 
 /**
  * ICollectionProducer - collection producer interface
  */
 export interface ICollectionProducer {
   collection: string;
-  queues: queueObjectType[];
+  queues: QueueObjectType[];
 }
 
 /**
@@ -13,7 +13,7 @@ export interface ICollectionProducer {
  */
 export class CollectionProducer implements ICollectionProducer{
   collection: string;
-  queues: queueObjectType[];
+  queues: QueueObjectType[];
 
   constructor(collectionProducer: ICollectionProducer) {
     this.collection = collectionProducer.collection;

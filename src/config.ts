@@ -2,7 +2,7 @@ import * as env from 'env-var';
 import { CollectionProducer } from './collectionProducer/collectionProducer.interface';
 import { fileIndexParser } from './responseProducer/parser/file.parser.middleware';
 import { permissionHiParser, permissionIndexParser } from './responseProducer/parser/permission.parser.middleware';
-import { queueObjectType } from './mongo-rabbit/src/paramTypes';
+import { QueueObjectType } from './mongo-rabbit/src/paramTypes';
 
 const esHost = env.get('ELASTICSEARCH_URL').default('http://localhost:9200').asString();
 const esUser = env.get('ELASTICSEARCH_USER').default('');
@@ -58,7 +58,7 @@ const config = {
   }
 };
 
-export const indexqueue: queueObjectType =  {
+export const indexqueue: QueueObjectType =  {
   name: config.queues.IndexQueue.name,
   exchange: {
     name:config.queues.IndexQueue.exchange,

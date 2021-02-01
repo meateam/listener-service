@@ -34,7 +34,7 @@ export async function initWatchAndNotify() : Promise<void> {
 
     const options: Partial<MTROptions> = {
       silent: false,
-      retries: 10
+      rabbitRetries: 10
     };
 
     try {

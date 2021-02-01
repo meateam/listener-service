@@ -15,6 +15,7 @@ FROM node:10.16.0-alpine
 COPY --from=builder /usr/src/app/package.json /usr/src/app/package-lock.json ./
 COPY --from=builder /bin/grpc_health_probe /bin/grpc_health_probe
 COPY --from=builder /usr/src/app/dist /dist
+COPY --from=builder /usr/src/app/proto /proto
 COPY --from=builder /usr/src/app/node_modules /node_modules
 LABEL Name=listener-service Version=0.0.1
 EXPOSE 3000

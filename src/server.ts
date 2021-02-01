@@ -1,16 +1,40 @@
 import * as grpc from 'grpc';
-import config from './config';
+import * as protoLoader from '@grpc/proto-loader';
 import {
   GrpcHealthCheck,
   HealthCheckResponse,
   HealthService,
   HealthCheckRequest,
   HealthClient } from 'grpc-ts-health-check';
+import config from './config';
+import ProducerMethods from './producer/producer.grpc';
 import { log, Severity } from './utils/logger';
+import { wrapper } from './utils/wrapper';
 
+// --- Proto loader ---
+const PRODUCER_PROTO_PATH: string = `${__dirname}/../proto/producer/producer.proto`;
+
+// Suggested options for similarity to existing grpc.load behavior
+const producerPackageDefinition: protoLoader.PackageDefinition = protoLoader.loadSync(
+  PRODUCER_PROTO_PATH,
+  {
+    keepCase: true,
+    longs: String,
+    enums: String,
+    defaults: true,
+    oneofs: true,
+  });
+
+  // Has the full package hierarchy
+const producerProtoDescriptor: grpc.GrpcObject = grpc.loadPackageDefinition(producerPackageDefinition);
+
+const producer_proto: any = producerProtoDescriptor.producer;
+
+// --- Service configuration ---
 const address: string = `${config.service.host}:${config.service.port}`;
 const serviceName: string = config.service.name;
 export const healthCheckStatusMap: any = {
+  '': HealthCheckResponse.ServingStatus.UNKNOWN,
   [serviceName]: HealthCheckResponse.ServingStatus.UNKNOWN
 };
 
@@ -22,14 +46,14 @@ export const healthCheckStatusMap: any = {
  */
 export default class Server {
   private static _instance: Server;
-  private request: HealthCheckRequest;
+  private requests: HealthCheckRequest[];
   private healthClient: HealthClient;
   public server: grpc.Server;
 
   public constructor () {
     // Create the server
     this.server = new grpc.Server();
-
+    this.requests = [];
     // Register the health service
     const grpcHealthCheck = new GrpcHealthCheck(healthCheckStatusMap);
     this.server.addService(HealthService, grpcHealthCheck);
@@ -39,8 +63,14 @@ export default class Server {
 
     // Create the health client and set service request
     this.healthClient = new HealthClient(address, grpc.credentials.createInsecure());
-    this.request = new HealthCheckRequest();
-    this.request.setService(serviceName);
+
+    for (const healthCheck in healthCheckStatusMap) {
+      const request = new HealthCheckRequest();
+      request.setService(healthCheck);
+      this.requests.push(request);
+    }
+
+    this.addServices();
 
     // Starting the server
     this.server.start();
@@ -51,12 +81,24 @@ export default class Server {
         'server bind');
   }
 
-  public setHealthStatus(status: HealthCheckResponse.ServingStatus): void {
-    const service: string = this.request.getService();
-    healthCheckStatusMap[service] = status;
+  private addServices() {
+    const producerService = {
+      SendMsg: wrapper(ProducerMethods.sendMsg),
+      SendPermissionDelete: wrapper(ProducerMethods.sendPermissionDelete),
+      SendContentChange: wrapper(ProducerMethods.sendContentChange)
+    }
 
-    this.healthClient.check(this.request, (error: Error | null, response: HealthCheckResponse) => {
-      if (error) console.log('Health Check Failed', error);
+    this.server.addService(producer_proto.ProducerService.service, producerService);
+  }
+
+  public setHealthStatus(status: HealthCheckResponse.ServingStatus): void {
+    this.requests.forEach((request) => {
+      const service: string = request.getService();
+      healthCheckStatusMap[service] = status;
+
+      this.healthClient.check(request, (error: Error | null, response: HealthCheckResponse) => {
+        if (error) console.log('Health Check Failed', error);
+      });
     });
   }
 
