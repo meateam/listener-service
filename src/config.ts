@@ -61,7 +61,7 @@ const config = {
 export const indexqueue: QueueObjectType =  {
   name: config.queues.IndexQueue.name,
   exchange: {
-    name:config.queues.IndexQueue.exchange,
+    name: config.queues.IndexQueue.exchange,
     type: 'direct',
     routingKey: config.queues.IndexQueue.routingKey
   },

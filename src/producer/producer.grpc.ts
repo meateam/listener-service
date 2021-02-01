@@ -1,6 +1,6 @@
 import { indexqueue } from '../config';
 import { OperationType } from '../collectionProducer/collectionProducer.enum';
-import { sendMsg} from '../mongo-rabbit/src';
+import { sendMsg } from '../mongo-rabbit/src';
 import { QueueObjectType, ExchangeObjectType } from '../mongo-rabbit/src/paramTypes';
 
 export default class ProducerMethods {
