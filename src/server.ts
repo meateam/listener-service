@@ -7,7 +7,7 @@ import {
   HealthCheckRequest,
   HealthClient } from 'grpc-ts-health-check';
 import config from './config';
-import ProducerMethods from './producer/producer.grpc';
+import ProducerMethods from './collectionProducer/producer.grpc';
 import { log, Severity } from './utils/logger';
 import { wrapper } from './utils/wrapper';
 

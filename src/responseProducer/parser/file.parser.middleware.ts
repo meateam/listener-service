@@ -4,23 +4,21 @@ import { FileResponse } from '../responseProducer.interface';
 
 // TODO: add document structure
 
-export function fileIndexParser(data: DataObjectType): FileResponse | FileResponse[] {
+/**
+ * fileIndexParser - file formatted msg
+ * @param data  - data object type (from mongo change)
+ * @returns FileResponse - file formatted msg
+ */
+export function fileIndexParser(data: DataObjectType): FileResponse | undefined {
   const operation = concludeMongoOperation(data.operation);
 
-  if (operation === OperationType.UPDATE) {
-    let responses: FileResponse[] = [];
-    const operations: OperationType[] = [OperationType.METADATA_CHANGE];
-    if ('size' in data.updateDescription.updatedFields) operations.push(OperationType.CONTENT_CHANGE);
-
-    responses = operations.map(oper => new FileResponse({
-      pushObjectReq: { event: oper }, fileID: data.id}
-    ));
-
-    return responses;
+  if (operation === OperationType.UPDATE &&
+      'updatedAt' in data.updateDescription.updatedFields) {
+    return;
   }
 
   const formattedData: FileResponse = new FileResponse({
-    pushObjectReq: { event: operation }, fileID: data.id
+    pushObjectReq: { event: operation }, fileId: data.id
   });
 
   return formattedData;

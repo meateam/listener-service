@@ -62,7 +62,7 @@ export const indexqueue: QueueObjectType =  {
   name: config.queues.IndexQueue.name,
   exchange: {
     name: config.queues.IndexQueue.exchange,
-    type: 'direct',
+    type: 'topic',
     routingKey: config.queues.IndexQueue.routingKey
   },
 };

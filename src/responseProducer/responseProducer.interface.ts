@@ -1,7 +1,7 @@
 import { ObjectType, OperationType } from '../collectionProducer/collectionProducer.enum';
 
 /**
- * Default response
+ * Default response interface
  */
 export interface IDefaultResponse {
   event: OperationType;
@@ -20,18 +20,18 @@ export class DefaultResponse implements IDefaultResponse {
 }
 
 /**
- * FileID response
+ * FileID response interface
  */
 export interface IFileResponse {
   pushObjectReq: IDefaultResponse;
-  fileID: string;
+  fileId: string;
 }
 
 export class FileResponse extends DefaultResponse {
-  fileID: string;
+  fileId: string;
 
   constructor(filePushObject: IFileResponse) {
     super(filePushObject.pushObjectReq);
-    this.fileID = filePushObject.fileID;
+    this.fileId = filePushObject.fileId;
   }
 }

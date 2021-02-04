@@ -1,9 +1,10 @@
 import apm from 'elastic-apm-node';
+import { HealthCheckResponse } from 'grpc-ts-health-check';
 import config from './config';
 import ListenerServer from './server';
-import { getMongoHealth, getRabbitHealth,
-  initWatchAndNotify } from './collectionProducer/collectionProducer.service';
-import { HealthCheckResponse } from 'grpc-ts-health-check';
+import { getMongoHealth,
+         getRabbitHealth, 
+         initWatchAndNotify } from './collectionProducer/collectionProducer.service';
 
 (async () => {
   apm.start({

@@ -3,17 +3,26 @@ import { MongoDataType, MTROptions, RabbitDataType } from '../mongo-rabbit/src/p
 import config, { collectionProducers } from '../config';
 import { Severity, log } from '../utils/logger';
 
+/**
+ * getRabbitHealth - check the health status of rabbitmq connection
+ * @returns boolean - if the rabbit is healthy or not
+ */
 export function getRabbitHealth(): boolean {
   const status: boolean = getRabbitHealthStatus();
   if (!status) log(Severity.ERROR, 'rabbit health status false', 'rabbit-health');
   return status;
 }
 
+/**
+ * getMongoHealth - check the health status of mongo connection
+ * @returns boolean - if the mongo is healthy or not
+ */
 export function getMongoHealth(): boolean {
   const status: boolean = getMongoHealthStatus();
   if (!status) log(Severity.ERROR, 'mongo health status false', 'mongo-health');
   return status;
 }
+
 /**
  * initWatchAndNotify initiates the mongo watchers and rabbit queues,
  * using the mongo-to-rabbit (mtr) package.
