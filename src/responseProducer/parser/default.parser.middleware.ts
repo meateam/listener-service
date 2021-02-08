@@ -1,6 +1,5 @@
 import { DataObjectType } from '../../mongo-rabbit/src/paramTypes';
 import { concludeMongoOperation, concludeObjectType } from '../../collectionProducer/collectionProducer.enum';
-import { log, Severity } from '../../utils/logger';
 import { DefaultResponse } from '../responseProducer.interface';
 
 /**
@@ -10,7 +9,7 @@ import { DefaultResponse } from '../responseProducer.interface';
  * @returns DefaultResponse - default formatted msg
  */
 export default function defaultParser(data: DataObjectType, collection?: string) : DefaultResponse {
-  log(Severity.INFO, 'got data:', 'defaultParser', undefined, data);
+  console.log('got data at defaultParser', data);
 
   const formattedData: DefaultResponse = new DefaultResponse(
     { data,

@@ -1,7 +1,6 @@
 import { DataObjectType } from '../../mongo-rabbit/src/paramTypes';
 import { concludeMongoOperation, OperationType } from '../../collectionProducer/collectionProducer.enum';
 import { PermissionObject } from '../../../proto/permission/generated/permission_pb';
-import { log, Severity } from '../../utils/logger';
 import { DefaultResponse, FileResponse } from '../responseProducer.interface';
 
 /**
@@ -10,7 +9,7 @@ import { DefaultResponse, FileResponse } from '../responseProducer.interface';
  * @returns FileResponse|undefiend - file formatted msg
  */
 export function permissionIndexParser(data: DataObjectType): FileResponse | undefined {
-  log(Severity.INFO, 'got data:', 'permissionIndexParser', undefined, data);
+  console.log('got data at permissionIndexParser', data);
 
   if (concludeMongoOperation(data.operation) !== OperationType.DELETE) {
 
@@ -32,7 +31,7 @@ export function permissionIndexParser(data: DataObjectType): FileResponse | unde
  * @returns DefaultResponse|undefiend - default formatted msg
  */
 export function permissionHiParser(data: DataObjectType): DefaultResponse | undefined {
-  log(Severity.INFO, 'got data:', 'permissionHiParser', undefined, data);
+  console.log('got data at permissionHiParser', data);
 
   const permissionDoc: PermissionObject = <PermissionObject>data.fullDocument;
   let operation: OperationType = concludeMongoOperation(data.operation);

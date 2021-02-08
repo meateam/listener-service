@@ -1,5 +1,4 @@
 import { DataObjectType } from '../../mongo-rabbit/src/paramTypes';
-import { log, Severity } from '../../utils/logger';
 import { concludeMongoOperation, OperationType } from '../../collectionProducer/collectionProducer.enum';
 import { FileResponse } from '../responseProducer.interface';
 
@@ -11,7 +10,7 @@ import { FileResponse } from '../responseProducer.interface';
  * @returns FileResponse - file formatted msg
  */
 export function fileIndexParser(data: DataObjectType): FileResponse | undefined {
-  log(Severity.INFO, 'got data fileIndexParser:', 'fileIndexParser', undefined, data);
+  console.log('got data at fileIndexParser', data);
   let operation: OperationType = concludeMongoOperation(data.operation);
 
   if (operation === OperationType.UPDATE) {
