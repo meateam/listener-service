@@ -1,20 +1,8 @@
 import { DataObjectType } from '../../mongo-rabbit/src/paramTypes';
 import { concludeMongoOperation, OperationType } from '../../collectionProducer/collectionProducer.enum';
+import { PermissionObject } from '../../../proto/permission/generated/permission_pb';
 import { log, Severity } from '../../utils/logger';
 import { DefaultResponse, FileResponse } from '../responseProducer.interface';
-
-// TODO: another definition & add error when castiong goes wrong
-export interface PermissionDoc {
-  _id: string;
-  fileID: string;
-  userID: string;
-  appID: string;
-  creator: string;
-  role: number;
-  created_at: string;
-  updated_at: string;
-}
-
 
 /**
  * permissionIndexParser - permission msg parser for index queue
@@ -25,11 +13,11 @@ export function permissionIndexParser(data: DataObjectType): FileResponse | unde
   log(Severity.INFO, 'got data:', 'permissionIndexParser', undefined, data);
 
   if (concludeMongoOperation(data.operation) !== OperationType.DELETE) {
-    
-    const permissionDoc: PermissionDoc = <PermissionDoc>data.fullDocument;
+
+    const permissionDoc: PermissionObject = <PermissionObject>data.fullDocument;
     const formattedData: FileResponse = new FileResponse({
       pushObjectReq: { event: OperationType.PERMISSIONS_CHANGE },
-      fileId: permissionDoc.fileID
+      fileId: permissionDoc.getFileid()
     });
 
     return formattedData;
@@ -46,12 +34,12 @@ export function permissionIndexParser(data: DataObjectType): FileResponse | unde
 export function permissionHiParser(data: DataObjectType): DefaultResponse | undefined {
   log(Severity.INFO, 'got data:', 'permissionHiParser', undefined, data);
 
-  const permissionDoc: PermissionDoc = <PermissionDoc>data.fullDocument;
+  const permissionDoc: PermissionObject = <PermissionObject>data.fullDocument;
   let operation: OperationType = concludeMongoOperation(data.operation);
 
   // If the creator isn't as the dest user - it is a new share permission
   if (operation === OperationType.CREATE &&
-      permissionDoc.creator !== permissionDoc.userID) {
+      permissionDoc.getCreator() !== permissionDoc.getUserid()) {
     operation = OperationType.SHARE_CREATED;
 
     const formattedData: DefaultResponse = new DefaultResponse({
