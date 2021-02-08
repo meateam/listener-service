@@ -1,5 +1,6 @@
-import { concludeMongoOperation, OperationType } from '../../collectionProducer/collectionProducer.enum';
 import { DataObjectType } from '../../mongo-rabbit/src/paramTypes';
+import { concludeMongoOperation, OperationType } from '../../collectionProducer/collectionProducer.enum';
+import { log, Severity } from '../../utils/logger';
 import { DefaultResponse, FileResponse } from '../responseProducer.interface';
 
 // TODO: another definition & add error when castiong goes wrong
@@ -14,13 +15,17 @@ export interface PermissionDoc {
   updated_at: string;
 }
 
+
 /**
  * permissionIndexParser - permission msg parser for index queue
  * @param data  - data object type (from mongo change)
  * @returns FileResponse|undefiend - file formatted msg
  */
 export function permissionIndexParser(data: DataObjectType): FileResponse | undefined {
+  log(Severity.INFO, 'got data:', 'permissionIndexParser', undefined, data);
+
   if (concludeMongoOperation(data.operation) !== OperationType.DELETE) {
+    
     const permissionDoc: PermissionDoc = <PermissionDoc>data.fullDocument;
     const formattedData: FileResponse = new FileResponse({
       pushObjectReq: { event: OperationType.PERMISSIONS_CHANGE },
@@ -39,6 +44,8 @@ export function permissionIndexParser(data: DataObjectType): FileResponse | unde
  * @returns DefaultResponse|undefiend - default formatted msg
  */
 export function permissionHiParser(data: DataObjectType): DefaultResponse | undefined {
+  log(Severity.INFO, 'got data:', 'permissionHiParser', undefined, data);
+
   const permissionDoc: PermissionDoc = <PermissionDoc>data.fullDocument;
   let operation: OperationType = concludeMongoOperation(data.operation);
 

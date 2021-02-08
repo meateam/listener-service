@@ -1,5 +1,6 @@
-import { concludeMongoOperation, OperationType } from '../../collectionProducer/collectionProducer.enum';
 import { DataObjectType } from '../../mongo-rabbit/src/paramTypes';
+import { log, Severity } from '../../utils/logger';
+import { concludeMongoOperation, OperationType } from '../../collectionProducer/collectionProducer.enum';
 import { FileResponse } from '../responseProducer.interface';
 
 // TODO: add document structure
@@ -10,11 +11,12 @@ import { FileResponse } from '../responseProducer.interface';
  * @returns FileResponse - file formatted msg
  */
 export function fileIndexParser(data: DataObjectType): FileResponse | undefined {
-  const operation = concludeMongoOperation(data.operation);
+  log(Severity.INFO, 'got data fileIndexParser:', 'fileIndexParser', undefined, data);
+  let operation: OperationType = concludeMongoOperation(data.operation);
 
-  if (operation === OperationType.UPDATE &&
-      'updatedAt' in data.updateDescription.updatedFields) {
-    return;
+  if (operation === OperationType.UPDATE) {
+    operation = OperationType.METADATA_CHANGE;
+    if ('size' in data.updateDescription.updatedFields) return;
   }
 
   const formattedData: FileResponse = new FileResponse({
