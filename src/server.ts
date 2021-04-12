@@ -5,37 +5,39 @@ import {
   HealthCheckResponse,
   HealthService,
   HealthCheckRequest,
-  HealthClient } from 'grpc-ts-health-check';
+  HealthClient,
+} from 'grpc-ts-health-check';
 import config from './config';
-import ProducerMethods from './collectionProducer/producer.grpc';
+import ProducerMethods from './producer/producer.grpc';
 import { log, Severity } from './utils/logger';
 import { wrapper } from './utils/wrapper';
 
-// --- Proto loader ---
+/**
+ ******* PROTO LOADER *******
+ */
 const PRODUCER_PROTO_PATH: string = `${__dirname}/../proto/producer/producer.proto`;
 
 // Suggested options for similarity to existing grpc.load behavior
-const producerPackageDefinition: protoLoader.PackageDefinition = protoLoader.loadSync(
-  PRODUCER_PROTO_PATH,
-  {
-    keepCase: true,
-    longs: String,
-    enums: String,
-    defaults: true,
-    oneofs: true,
-  });
+const producerPackageDefinition: protoLoader.PackageDefinition = protoLoader.loadSync(PRODUCER_PROTO_PATH, {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
 
-  // Has the full package hierarchy
+// Has the full package hierarchy
 const producerProtoDescriptor: grpc.GrpcObject = grpc.loadPackageDefinition(producerPackageDefinition);
-
 const producer_proto: any = producerProtoDescriptor.producer;
 
-// --- Service configuration ---
+/**
+ ******* SERVICE CONFIGURATION *******
+ */
 const address: string = `${config.service.host}:${config.service.port}`;
 const serviceName: string = config.service.name;
 export const healthCheckStatusMap: any = {
   '': HealthCheckResponse.ServingStatus.UNKNOWN,
-  [serviceName]: HealthCheckResponse.ServingStatus.UNKNOWN
+  [serviceName]: HealthCheckResponse.ServingStatus.UNKNOWN,
 };
 
 /**
@@ -50,10 +52,11 @@ export default class Server {
   private healthClient: HealthClient;
   public server: grpc.Server;
 
-  public constructor () {
+  public constructor() {
     // Create the server
     this.server = new grpc.Server();
     this.requests = [];
+
     // Register the health service
     const grpcHealthCheck = new GrpcHealthCheck(healthCheckStatusMap);
     this.server.addService(HealthService, grpcHealthCheck);
@@ -74,19 +77,21 @@ export default class Server {
 
     // Starting the server
     this.server.start();
-    log(Severity.INFO,
-        `server listening on address: ${address} in
-         ${config.service.debugMode ? 'DEBUG' : 'PROD'} environment
-         on port ${config.service.port}`,
-        'server bind');
+    log(
+      Severity.INFO,
+      `server listening on address: ${address} in ${config.service.debugMode ? 'DEBUG' : 'PROD'} environment on port ${
+        config.service.port
+      }`,
+      'server bind'
+    );
   }
 
   private addServices() {
     const producerService = {
       SendMsg: wrapper(ProducerMethods.sendMsg),
       SendPermissionDelete: wrapper(ProducerMethods.sendPermissionDelete),
-      SendContentChange: wrapper(ProducerMethods.sendContentChange)
-    }
+      SendContentChange: wrapper(ProducerMethods.sendContentChange),
+    };
 
     this.server.addService(producer_proto.ProducerService.service, producerService);
   }

@@ -5,13 +5,12 @@ import { log, Severity } from './logger';
 import { ApplicationError } from './errors/application.error';
 import { statusToString, validateGrpcError } from './errors/grpc.status';
 
-
   /**
    * wraps all of the service methods, creating the transaction for the apm and the logger,
    * and sends them to the elastic server.
    * @param func - the method called and wrapped.
    */
-  export function wrapper(func: Function) :
+export function wrapper(func: Function) :
   (call: grpc.ServerUnaryCall<Object>, callback: grpc.requestCallback<Object>) => Promise<void> {
   return async (call: grpc.ServerUnaryCall<Object>, callback: grpc.requestCallback<Object>) => {
     try {
@@ -35,10 +34,10 @@ import { statusToString, validateGrpcError } from './errors/grpc.status';
 }
 
 export function getCurrTraceId() : string {
-    try {
-      return apm.currentTransaction? apm.currentTransaction.traceparent.split('-')[1]: '';
-    } catch (err) {
+  try {
+    return apm.currentTransaction ? apm.currentTransaction.traceparent.split('-')[1] : '';
+  } catch (err) {
       // Should never get here. The log is set after apm starts.
-      return '';
-    }
+    return '';
   }
+}

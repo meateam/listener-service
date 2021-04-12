@@ -1,4 +1,4 @@
-import { QueueObjectType } from '../mongo-rabbit/src/paramTypes';
+import { QueueObjectType } from 'mongo-to-rabbit/src/paramTypes';
 
 /**
  * ICollectionProducer - collection producer interface
@@ -11,7 +11,7 @@ export interface ICollectionProducer {
 /**
  * CollectionProducer
  */
-export class CollectionProducer implements ICollectionProducer{
+export class CollectionProducer implements ICollectionProducer {
   collection: string;
   queues: QueueObjectType[];
 

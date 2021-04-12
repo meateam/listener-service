@@ -7,8 +7,6 @@ WORKDIR /usr/src/app
 COPY ["package.json", "package-lock.json*", "./"]
 RUN npm install --silent && cp -r node_modules ../
 COPY . .
-RUN cd /usr/src/app/src/mongo-rabbit && npm install 
-RUN cd .. 
 RUN npm run build
 
 FROM node:10.16.0-alpine

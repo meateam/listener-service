@@ -3,8 +3,8 @@ import { HealthCheckResponse } from 'grpc-ts-health-check';
 import config from './config';
 import ListenerServer from './server';
 import { getMongoHealth,
-         getRabbitHealth, 
-         initWatchAndNotify } from './collectionProducer/collectionProducer.service';
+         getRabbitHealth,
+         initWatchAndNotify } from './producer/producer.service';
 
 (async () => {
   apm.start({
@@ -25,5 +25,5 @@ import { getMongoHealth,
     getRabbitHealth() && getMongoHealth() ?
     listenerServer.setHealthStatus(HealthCheckResponse.ServingStatus.SERVING) :
     listenerServer.setHealthStatus(HealthCheckResponse.ServingStatus.NOT_SERVING);
-  },          10000);
+  },          config.checkHealthInterval);
 })();

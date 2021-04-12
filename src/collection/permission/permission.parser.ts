@@ -1,7 +1,8 @@
-import { DataObjectType } from '../../mongo-rabbit/src/paramTypes';
-import { concludeMongoOperation, OperationType } from '../../collectionProducer/collectionProducer.enum';
+import DefaultResponse from '../default/default.response';
+import FileResponse from '../file/file.response';
+import { DataObjectType } from 'mongo-to-rabbit/src/paramTypes';
+import { concludeMongoOperation, RabbitMsgType } from '../collection.enum';
 import { PermissionObject } from '../../../proto/permission/generated/permission_pb';
-import { DefaultResponse, FileResponse } from '../responseProducer.interface';
 
 /**
  * permissionIndexParser - permission msg parser for index queue
@@ -11,12 +12,11 @@ import { DefaultResponse, FileResponse } from '../responseProducer.interface';
 export function permissionIndexParser(data: DataObjectType): FileResponse | undefined {
   console.log('got data at permissionIndexParser', data);
 
-  if (concludeMongoOperation(data.operation) !== OperationType.DELETE) {
-
+  if (concludeMongoOperation(data.operation) !== RabbitMsgType.DELETE) {
     const permissionDoc: PermissionObject = <PermissionObject>data.fullDocument;
     const formattedData: FileResponse = new FileResponse({
-      pushObjectReq: { event: OperationType.PERMISSIONS_CHANGE },
-      fileId: permissionDoc.getFileid()
+      pushObjectReq: { event: RabbitMsgType.PERMISSIONS_CHANGE },
+      fileId: permissionDoc.getFileid(),
     });
 
     return formattedData;
@@ -34,13 +34,10 @@ export function permissionHiParser(data: DataObjectType): DefaultResponse | unde
   console.log('got data at permissionHiParser', data);
 
   const permissionDoc: PermissionObject = <PermissionObject>data.fullDocument;
-  let operation: OperationType = concludeMongoOperation(data.operation);
+  const operation: RabbitMsgType = concludeMongoOperation(data.operation);
 
   // If the creator isn't as the dest user - it is a new share permission
-  if (operation === OperationType.CREATE &&
-      permissionDoc.getCreator() !== permissionDoc.getUserid()) {
-    operation = OperationType.SHARE_CREATED;
-
+  if (operation === RabbitMsgType.CREATE && permissionDoc.getCreator() !== permissionDoc.getUserid()) {
     const formattedData: DefaultResponse = new DefaultResponse({
       event: operation,
       data: permissionDoc,

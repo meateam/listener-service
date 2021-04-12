@@ -1,5 +1,5 @@
-import watchAndNotify, { getMongoHealthStatus, getRabbitHealthStatus } from '../mongo-rabbit/src/index';
-import { MongoDataType, MTROptions, RabbitDataType } from '../mongo-rabbit/src/paramTypes';
+import watchAndNotify, { getMongoHealthStatus, getRabbitHealthStatus } from 'mongo-to-rabbit';
+import { MongoDataType, MTROptions, RabbitDataType } from 'mongo-to-rabbit/src/paramTypes';
 import config, { collectionProducers } from '../config';
 import { Severity, log } from '../utils/logger';
 
@@ -28,9 +28,8 @@ export function getMongoHealth(): boolean {
  * using the mongo-to-rabbit (mtr) package.
  * The queues are taken from the colToQueueArray in the config file.
  */
-export async function initWatchAndNotify() : Promise<void> {
+export async function initWatchAndNotify(): Promise<void> {
   for (const collectionProducer of Object.values(collectionProducers)) {
-
     const mongoData: MongoDataType = {
       collectionName: collectionProducer.collection,
       connectionString: config.mongo.uri,
@@ -38,18 +37,22 @@ export async function initWatchAndNotify() : Promise<void> {
 
     const rabbitData: RabbitDataType = {
       rabbitURI: config.rabbit.url,
-      queues: collectionProducer.queues
+      queues: collectionProducer.queues,
     };
 
     const options: Partial<MTROptions> = {
       silent: false,
-      rabbitRetries: 10
+      rabbitRetries: 10,
     };
 
     try {
       await watchAndNotify(mongoData, rabbitData, options);
     } catch (err) {
-      log(Severity.ERROR, `error while connecting to MTR for collection: ${JSON.stringify(collectionProducer)} : ${err}`, 'mtr.watchAndNotify');
+      log(
+        Severity.ERROR,
+        `error while connecting to MTR for collection: ${JSON.stringify(collectionProducer)} : ${err}`,
+        'mtr.watchAndNotify'
+      );
       return;
     }
   }
