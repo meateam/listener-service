@@ -12,7 +12,7 @@ export default class ProducerMethods {
    * sendMsg - send msg to every queue
    * @param {SendMsgRequest} call
    */
-  public static async sendMsg(call: any): Promise<void> {
+  public static sendMsg(call: any): void {
     const msg: string = call.request.msg;
     const queue: string = call.request.queue;
     const exchange: ExchangeObjectType = call.request.exchange;
@@ -25,7 +25,7 @@ export default class ProducerMethods {
    * sendPermissionDelete - send msg index queue about permission deletion
    * @param {SendPermissionDeleteRequest} call
    */
-  public static async sendPermissionDelete(call: any): Promise<void> {
+  public static sendPermissionDelete(call: any): void {
     const fileId: string = call.request.fileID;
     const data: FileResponse = { fileId, event: RabbitMsgType.PERMISSIONS_CHANGE };
 
@@ -36,7 +36,7 @@ export default class ProducerMethods {
    * sendContentChange - send msg index queue about content change
    * @param {SendContentChangeRequest} call
    */
-  public static async sendContentChange(call: any): Promise<void> {
+  public static sendContentChange(call: any): void {
     const fileId: string = call.request.fileID;
     const data: FileResponse = { fileId, event: RabbitMsgType.CONTENT_CHANGE };
     sendMsg(indexqueue, data);

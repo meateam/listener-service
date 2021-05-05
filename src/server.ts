@@ -1,16 +1,16 @@
-import * as grpc from 'grpc';
-import * as protoLoader from '@grpc/proto-loader';
+import * as grpc from "grpc";
+import config from "./config";
+import ProducerMethods from "./producer/producer.grpc";
+import * as protoLoader from "@grpc/proto-loader";
 import {
   GrpcHealthCheck,
   HealthCheckResponse,
   HealthService,
   HealthCheckRequest,
   HealthClient,
-} from 'grpc-ts-health-check';
-import config from './config';
-import ProducerMethods from './producer/producer.grpc';
-import { log, Severity } from './utils/logger';
-import { wrapper } from './utils/wrapper';
+} from "grpc-ts-health-check";
+import { log, Severity } from "./utils/logger";
+import { wrapper } from "./utils/wrapper";
 
 /**
  ******* PROTO LOADER *******
@@ -36,7 +36,7 @@ const producer_proto: any = producerProtoDescriptor.producer;
 const address: string = `${config.service.host}:${config.service.port}`;
 const serviceName: string = config.service.name;
 export const healthCheckStatusMap: any = {
-  '': HealthCheckResponse.ServingStatus.UNKNOWN,
+  "": HealthCheckResponse.ServingStatus.UNKNOWN,
   [serviceName]: HealthCheckResponse.ServingStatus.UNKNOWN,
 };
 
@@ -79,10 +79,10 @@ export default class Server {
     this.server.start();
     log(
       Severity.INFO,
-      `server listening on address: ${address} in ${config.service.debugMode ? 'DEBUG' : 'PROD'} environment on port ${
+      `server listening on address: ${address} in ${config.service.debugMode ? "DEBUG" : "PROD"} environment on port ${
         config.service.port
       }`,
-      'server bind'
+      "server bind"
     );
   }
 
@@ -102,7 +102,7 @@ export default class Server {
       healthCheckStatusMap[service] = status;
 
       this.healthClient.check(request, (error: Error | null, response: HealthCheckResponse) => {
-        if (error) console.log('Health Check Failed', error);
+        if (error) console.log("Health Check Failed", error);
       });
     });
   }

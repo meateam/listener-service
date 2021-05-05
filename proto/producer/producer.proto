@@ -23,8 +23,6 @@ message SendMsgRequest {
 	string queue = 2;
 
 	ExchangeObjectType exchange = 3;
-
-	// TODO: CHANGE TO exchange or queue
 }
 
 message SendMsgResponse {

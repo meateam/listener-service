@@ -1,7 +1,8 @@
-import watchAndNotify, { getMongoHealthStatus, getRabbitHealthStatus } from 'mongo-to-rabbit';
-import { MongoDataType, MTROptions, RabbitDataType } from 'mongo-to-rabbit/src/paramTypes';
-import config, { collectionProducers } from '../config';
-import { Severity, log } from '../utils/logger';
+import watchAndNotify, { getMongoHealthStatus, getRabbitHealthStatus } from "mongo-to-rabbit";
+import { MongoDataType, MTROptions, RabbitDataType } from "mongo-to-rabbit/src/paramTypes";
+import config, { collectionProducers } from "../config";
+import { Severity, log } from "../utils/logger";
+import { CollectionProducer } from "./producer.collection";
 
 /**
  * getRabbitHealth - check the health status of rabbitmq connection
@@ -9,7 +10,7 @@ import { Severity, log } from '../utils/logger';
  */
 export function getRabbitHealth(): boolean {
   const status: boolean = getRabbitHealthStatus();
-  if (!status) log(Severity.ERROR, 'rabbit health status false', 'rabbit-health');
+  if (!status) log(Severity.ERROR, "rabbit health status false", "rabbit-health");
   return status;
 }
 
@@ -19,7 +20,7 @@ export function getRabbitHealth(): boolean {
  */
 export function getMongoHealth(): boolean {
   const status: boolean = getMongoHealthStatus();
-  if (!status) log(Severity.ERROR, 'mongo health status false', 'mongo-health');
+  if (!status) log(Severity.ERROR, "mongo health status false", "mongo-health");
   return status;
 }
 
@@ -29,31 +30,33 @@ export function getMongoHealth(): boolean {
  * The queues are taken from the colToQueueArray in the config file.
  */
 export async function initWatchAndNotify(): Promise<void> {
-  for (const collectionProducer of Object.values(collectionProducers)) {
-    const mongoData: MongoDataType = {
-      collectionName: collectionProducer.collection,
-      connectionString: config.mongo.uri,
-    };
+  await Promise.all(
+    Object.values(collectionProducers).map(async (collectionProducer) => {
+      const mongoData: MongoDataType = {
+        collectionName: collectionProducer.collection,
+        connectionString: config.mongo.uri,
+      };
 
-    const rabbitData: RabbitDataType = {
-      rabbitURI: config.rabbit.url,
-      queues: collectionProducer.queues,
-    };
+      const rabbitData: RabbitDataType = {
+        rabbitURI: config.rabbit.url,
+        queues: collectionProducer.queues,
+      };
 
-    const options: Partial<MTROptions> = {
-      silent: false,
-      rabbitRetries: 10,
-    };
+      const options: Partial<MTROptions> = {
+        silent: false,
+        rabbitRetries: 10,
+      };
 
-    try {
-      await watchAndNotify(mongoData, rabbitData, options);
-    } catch (err) {
-      log(
-        Severity.ERROR,
-        `error while connecting to MTR for collection: ${JSON.stringify(collectionProducer)} : ${err}`,
-        'mtr.watchAndNotify'
-      );
-      return;
-    }
-  }
+      try {
+        await watchAndNotify(mongoData, rabbitData, options);
+      } catch (err) {
+        log(
+          Severity.ERROR,
+          `error while connecting to MTR for collection: ${JSON.stringify(collectionProducer)} : ${err}`,
+          "mtr.watchAndNotify"
+        );
+        return;
+      }
+    })
+  );
 }
