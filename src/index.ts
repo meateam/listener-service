@@ -1,19 +1,10 @@
-import apm from 'elastic-apm-node';
-import { HealthCheckResponse } from 'grpc-ts-health-check';
-import config from './config';
-import ListenerServer from './server';
-import { getMongoHealth,
-         getRabbitHealth,
-         initWatchAndNotify } from './producer/producer.service';
+import apm from "elastic-apm-node";
+import config from "./config";
+import ListenerServer from "./server";
+import { HealthCheckResponse } from "grpc-ts-health-check";
+import { getMongoHealth, getRabbitHealth, initWatchAndNotify } from "./producer/producer.service";
 
 (async () => {
-  apm.start({
-    serviceName: config.service.name,
-    secretToken: config.apmConfig.secretToken,
-    verifyServerCert: config.apmConfig.verifyServerCert,
-    serverUrl: config.apmConfig.apmURL,
-  });
-
   // Initiate watchAndNotify for each producer.
   await initWatchAndNotify();
 
@@ -22,8 +13,8 @@ import { getMongoHealth,
 
   // Check health interval (of rabbit and mongo)
   setInterval(() => {
-    getRabbitHealth() && getMongoHealth() ?
-    listenerServer.setHealthStatus(HealthCheckResponse.ServingStatus.SERVING) :
-    listenerServer.setHealthStatus(HealthCheckResponse.ServingStatus.NOT_SERVING);
-  },          config.checkHealthInterval);
+    getRabbitHealth() && getMongoHealth()
+      ? listenerServer.setHealthStatus(HealthCheckResponse.ServingStatus.SERVING)
+      : listenerServer.setHealthStatus(HealthCheckResponse.ServingStatus.NOT_SERVING);
+  }, config.checkHealthInterval);
 })();

@@ -1,7 +1,8 @@
 import * as grpc from "grpc";
+import * as protoLoader from "@grpc/proto-loader";
 import config from "./config";
 import ProducerMethods from "./producer/producer.grpc";
-import * as protoLoader from "@grpc/proto-loader";
+import apm from 'elastic-apm-node';
 import {
   GrpcHealthCheck,
   HealthCheckResponse,
@@ -11,6 +12,15 @@ import {
 } from "grpc-ts-health-check";
 import { log, Severity } from "./utils/logger";
 import { wrapper } from "./utils/wrapper";
+
+
+apm.start({
+  serviceName: config.service.name,
+  secretToken: config.apmConfig.secretToken,
+  verifyServerCert: config.apmConfig.verifyServerCert,
+  serverUrl: config.apmConfig.apmURL,
+});
+
 
 /**
  ******* PROTO LOADER *******

@@ -1,6 +1,7 @@
 import DefaultResponse from './default.response';
 import { DataObjectType } from 'mongo-to-rabbit/src/paramTypes';
 import { concludeMongoOperation, concludeObjectType } from '../collection.enum';
+import { log, Severity } from "../../utils/logger";
 
 /**
  * defaultParser - take an event from mongo and parse it to rabbit msg queue
@@ -9,7 +10,7 @@ import { concludeMongoOperation, concludeObjectType } from '../collection.enum';
  * @returns { DefaultResponse } - default formatted msg
  */
 export default function defaultParser(data: DataObjectType, collection?: string): DefaultResponse {
-  console.log('got data at defaultParser', data);
+  log(Severity.INFO, "got data at defaultParser", "defaultParser", undefined, data);
 
   const formattedData: DefaultResponse = new DefaultResponse({
     data,

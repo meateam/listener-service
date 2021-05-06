@@ -1,6 +1,7 @@
-import FileResponse from "./file.response";
-import { DataObjectType } from "mongo-to-rabbit/src/paramTypes";
-import { concludeMongoOperation, RabbitMsgType } from "../collection.enum";
+import FileResponse from './file.response';
+import { DataObjectType } from 'mongo-to-rabbit/src/paramTypes';
+import { concludeMongoOperation, RabbitMsgType } from '../collection.enum';
+import { log, Severity } from '../../utils/logger';
 
 /**
  * fileIndexParser - take an event from file collection mongo and parse it to index queue
@@ -8,7 +9,8 @@ import { concludeMongoOperation, RabbitMsgType } from "../collection.enum";
  * @returns {FileResponse} - file formatted msg
  */
 export function fileIndexParser(data: DataObjectType): FileResponse | undefined {
-  console.log("got data at fileIndexParser", data);
+  log(Severity.INFO, 'got data at fileIndexParser', 'fileIndexParser', undefined, data);
+
   let operation: RabbitMsgType = concludeMongoOperation(data.operation);
 
   if (operation === RabbitMsgType.UPDATE) {
@@ -17,7 +19,7 @@ export function fileIndexParser(data: DataObjectType): FileResponse | undefined 
 
     // If size field in updated fields, don't send msg to the queue because it will
     // send by online edit service
-    if ("size" in data.updateDescription.updatedFields) return;
+    if ('size' in data.updateDescription.updatedFields) return;
   }
 
   const formattedData: FileResponse = new FileResponse({

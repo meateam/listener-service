@@ -1,8 +1,8 @@
-import FileResponse from "../collection/file/file.response";
-import { sendMsg } from "mongo-to-rabbit";
-import { indexqueue } from "../config";
-import { RabbitMsgType } from "../collection/collection.enum";
-import { QueueObjectType, ExchangeObjectType } from "mongo-to-rabbit/src/paramTypes";
+import FileResponse from '../collection/file/file.response';
+import { sendMsg } from 'mongo-to-rabbit';
+import { indexqueue } from '../collection/collection.object';
+import { RabbitMsgType } from '../collection/collection.enum';
+import { QueueObjectType, ExchangeObjectType } from 'mongo-to-rabbit/src/paramTypes';
 
 /**
  * Producer grpc service methods
