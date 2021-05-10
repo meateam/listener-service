@@ -1,8 +1,8 @@
-import watchAndNotify, { getMongoHealthStatus, getRabbitHealthStatus } from "mongo-to-rabbit";
-import { MongoDataType, MTROptions, RabbitDataType } from "mongo-to-rabbit/src/paramTypes";
-import config, { collectionProducers } from "../config";
-import { Severity, log } from "../utils/logger";
-import { CollectionProducer } from "./producer.collection";
+import config from '../config';
+import watchAndNotify, { getMongoHealthStatus, getRabbitHealthStatus } from 'mongo-to-rabbit';
+import { MongoDataType, MTROptions, RabbitDataType } from 'mongo-to-rabbit/src/paramTypes';
+import { collectionProducers } from '../collection/collection.object';
+import { Severity, log } from '../utils/logger';
 
 /**
  * getRabbitHealth - check the health status of rabbitmq connection
@@ -10,7 +10,7 @@ import { CollectionProducer } from "./producer.collection";
  */
 export function getRabbitHealth(): boolean {
   const status: boolean = getRabbitHealthStatus();
-  if (!status) log(Severity.ERROR, "rabbit health status false", "rabbit-health");
+  if (!status) log(Severity.ERROR, 'rabbit health status false', 'rabbit-health');
   return status;
 }
 
@@ -20,7 +20,7 @@ export function getRabbitHealth(): boolean {
  */
 export function getMongoHealth(): boolean {
   const status: boolean = getMongoHealthStatus();
-  if (!status) log(Severity.ERROR, "mongo health status false", "mongo-health");
+  if (!status) log(Severity.ERROR, 'mongo health status false', 'mongo-health');
   return status;
 }
 
@@ -53,7 +53,7 @@ export async function initWatchAndNotify(): Promise<void> {
         log(
           Severity.ERROR,
           `error while connecting to MTR for collection: ${JSON.stringify(collectionProducer)} : ${err}`,
-          "mtr.watchAndNotify"
+          'mtr.watchAndNotify'
         );
         return;
       }
