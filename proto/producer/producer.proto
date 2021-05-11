@@ -4,9 +4,9 @@ package producer;
 
 service ProducerService {
 	// SendMsg sends msg to queue
-	rpc SendMsg(SendMsgRequest) returns (SendMsgResponse) {}
-	rpc SendPermissionDelete(SendPermissionDeleteRequest) returns (SendMsgResponse) {}
-	rpc SendContentChange(SendContentChangeRequest) returns (SendMsgResponse) {}
+	rpc SendMsg(SendMsgRequest) returns (EmptyResponse) {}
+	rpc SendPermissionDelete(SendPermissionDeleteRequest) returns (EmptyResponse) {}
+	rpc SendContentChange(SendContentChangeRequest) returns (EmptyResponse) {}
 }
 
 message ExchangeObjectType {
@@ -25,7 +25,7 @@ message SendMsgRequest {
 	ExchangeObjectType exchange = 3;
 }
 
-message SendMsgResponse {
+message EmptyResponse {
 	
 }
 
