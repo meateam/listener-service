@@ -3,17 +3,17 @@ services:
   listener-service:
     build: .
     environment:
-      DEBUG_MODE: 'true'
-      RABBIT_HOST: 'amqp://rabbitmq'
-      MONGO_HOST: 'mongodb://mongo1:27017,mongo2:27017,mongo3:27017/devDB?replicaSet=rs0'
-    ports: 
+      DEBUG_MODE: "true"
+      RABBIT_HOST: "amqp://rabbitmq"
+      MONGO_HOST: "mongodb://mongo1:27017,mongo2:27018,mongo3:27019/devDB?replicaSet=rs0"
+    ports:
       - 3000:3000
     depends_on:
       - mongo1
       - mongo2
       - mongo3
       - rabbitmq
-      
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq
@@ -21,31 +21,33 @@ services:
       - 5672:5672
       - 15672:15672
 
-  # The mongo replicaSet. to initiate, run rs.initiate() on one of the containers.
-  # To run the service locally, run `sudo nano /etc/hosts` and add mongo1,2,3 as localhost 
+  # The mongo replicaSet.
+  # To run the service locally, run `sudo nano /etc/hosts` and add mongo1,2,3 as localhost
   mongo1:
-    hostname: mongo1
+    image: mongo:4.2
     container_name: mongo1
-    image: mongo:4.4
+    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+    volumes:
+      - ./data/mongo-1:/data/db
     ports:
       - 27017:27017
-    restart: always
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+    healthcheck:
+      test: test $$(echo "rs.initiate({_id:'rs0',members:[{_id:0,host:\"mongo1:27017\"},{_id:1,host:\"mongo2:27018\"},{_id:2,host:\"mongo3:27019\"}]}).ok || rs.status().ok" | mongo --port 27017 --quiet) -eq 1
+      interval: 10s
+      timeout: 30s
   mongo2:
-    hostname: mongo2
+    image: mongo:4.2
     container_name: mongo2
-    image: mongo:4.4
+    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27018"]
+    volumes:
+      - ./data/mongo-2:/data/db
     ports:
-      - 27018:27017
-    restart: always
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+      - 27018:27018
   mongo3:
-    hostname: mongo3
+    image: mongo:4.2
     container_name: mongo3
-    image: mongo:4.4
+    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27019"]
+    volumes:
+      - ./data/mongo-3:/data/db
     ports:
-      - 27019:27017
-    restart: always
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
-
-
+      - 27019:27019
