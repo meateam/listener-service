@@ -1,18 +1,18 @@
 import * as winston from 'winston';
 import * as os from 'os';
 import * as elasticsearch from 'winston-elasticsearch';
-import { confLogger, debugMode, useElastic, indexTemplateMapping, serviceName } from '../config';
+import config, { indexTemplateMapping } from '../config';
 
 export const logger: winston.Logger = winston.createLogger({
-  defaultMeta: { service: serviceName, hostname: os.hostname() },
+  defaultMeta: { service: config.service.name, hostname: os.hostname() },
 });
 
 // configure logger
-if (useElastic) {
+if (config.elasticsearch.esUser !== undefined) {
   const es = new elasticsearch.default({
-    indexPrefix: confLogger.indexPrefix,
+    indexPrefix: config.logger.indexPrefix,
     level: 'verbose',
-    clientOpts: confLogger.options,
+    clientOpts: config.logger.options,
     bufferLimit: 100,
     messageType: 'log',
     ensureMappingTemplate: true,
@@ -21,7 +21,7 @@ if (useElastic) {
   logger.add(es);
 }
 
-if (debugMode) {
+if (config.service.debugMode) {
   const consoleLogger = new winston.transports.Console();
   logger.add(consoleLogger);
 }
