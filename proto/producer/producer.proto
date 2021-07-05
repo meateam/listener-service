@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package producer;
+
+service ProducerService {
+	// SendMsg sends msg to queue
+	rpc SendMsg(SendMsgRequest) returns (EmptyResponse) {}
+	rpc SendPermissionDelete(SendPermissionDeleteRequest) returns (EmptyResponse) {}
+	rpc SendContentChange(SendContentChangeRequest) returns (EmptyResponse) {}
+}
+
+message ExchangeObjectType {
+	string name = 1;
+	string type = 2;
+	string routingKey = 3;
+}
+
+message SendMsgRequest {
+	// The msg that being sent.
+	string msg = 1;
+
+	// Rabbit queue name 
+	string queue = 2;
+
+	ExchangeObjectType exchange = 3;
+}
+
+message EmptyResponse {
+	
+}
+
+message SendPermissionDeleteRequest {
+	// The fileID of the permission
+	string fileID = 1;
+}
+
+message SendContentChangeRequest {
+	// The fileID of the permission
+	string fileID = 1;
+}

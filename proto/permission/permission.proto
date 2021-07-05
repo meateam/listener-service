@@ -1,0 +1,185 @@
+syntax = "proto3";
+
+package permission;
+
+enum Role {
+	NONE = 0;
+	WRITE = 1;
+	READ = 2;
+}
+
+service Permission {
+	// CreatePermission creates a new permission and returns it, if permission already exists, update it.
+	rpc CreatePermission(CreatePermissionRequest) returns (PermissionObject) {}
+
+	// DeletePermission deletes a permission and returns it.
+	rpc DeletePermission(DeletePermissionRequest) returns (PermissionObject) {}
+
+	// GetFilePermissions returns the users and their role that have a permission to fileID.
+	rpc GetFilePermissions(GetFilePermissionsRequest) returns (GetFilePermissionsResponse) {}
+
+	// GetUserPermissions returns the files that the user was given permission to.
+	rpc GetUserPermissions(GetUserPermissionsRequest) returns (GetUserPermissionsResponse) {}
+
+	// IsPermitted returns true if userID is permitted to a fileID with the wanted role.
+	rpc IsPermitted(IsPermittedRequest) returns (IsPermittedResponse) {}
+
+	// DeleteFilePermissions deletes all permissions of a file and returns them.
+	rpc DeleteFilePermissions(DeleteFilePermissionsRequest) returns (DeleteFilePermissionsResponse) {}
+
+	// GetPermission returns a permission of the user to a file.
+	rpc GetPermission(GetPermissionRequest) returns (PermissionObject) {}
+
+	// GetPermission returns a permission of by its mongoID.
+	rpc GetPermissionByMongoID(GetPermissionByMongoIDRequest) returns (PermissionObject) {}
+}
+
+message CreatePermissionRequest {
+	// The ID of the file which is being permitted.
+	string fileID = 1;
+
+	// The ID of the user that's given the permission.
+	string userID = 2;
+
+	// The role of the permission.
+	Role role = 3;
+
+	// The ID of the user that created the permission.
+	string creator = 4;
+
+	// Signifies wether or not to override the permission if already exists.
+	bool override = 5;
+
+	// The ID of the application which created the permission.
+	string appID = 6;
+}
+
+message DeletePermissionRequest {
+	// The ID of the file which is being permitted.
+	string fileID = 1;
+
+	// The ID of the user that's given the permission.
+	string userID = 2;
+}
+
+message PermissionObject {
+	// The ID of the permission.
+	string id = 1;
+
+	// The ID of the file which is being pemitted.
+	string fileID = 2;
+
+	// The ID of the user that's given the permission.
+	string userID = 3;
+
+	// The role of the permission.
+	Role role = 4;
+
+	// The ID of the user that created the permission.
+	string creator = 5;
+
+	// The ID of the application which created the permission.
+	string appID = 6;
+
+	// The unix time for when the permission was created.
+	int64 createdAt = 7;
+
+	// The unix time for when the permission was last updated.
+	int64 updatedAt = 8;
+}
+
+message GetPermissionRequest {
+	string fileID = 1;
+	string userID = 2;
+}
+
+message GetPermissionByMongoIDRequest {
+	string mongoID = 1;
+}
+
+message GetFilePermissionsRequest {
+	// The ID of the file which is being permitted.
+	string fileID = 1;
+}
+
+message GetFilePermissionsResponse {
+	// The role of a user.
+	message UserRole {
+		// The user ID.
+		string userID = 1;
+
+		// The role of the user.
+		Role role = 2;
+
+		// The creator of the permission.
+		string creator = 3;
+	}
+
+	// Array of user roles.
+	repeated UserRole permissions = 1;
+}
+
+message IsPermittedRequest {
+	// The ID of the file which is being permitted.
+	string fileID = 1;
+
+	// The ID of the user that's given the permission.
+	string userID = 2;
+
+	// The role of the permission.
+	Role role = 3;
+}
+
+message IsPermittedResponse {
+	bool permitted = 1;
+}
+
+message GetUserPermissionsRequest {
+	// The ID of the user to get its permissions.
+	string userID = 1;
+
+	// The page number requested. 
+	int64 pageNum = 2;
+
+	// The number of documents per page.
+	int64 pageSize = 3;
+
+	// if true, return only permissions where the userID is not th same as creator.
+	// defaults to false
+	bool isShared = 4;
+
+	// The appID that the permissions requested belong to.
+	// Default - return from all apps.
+	string appID = 5;
+}
+
+message GetUserPermissionsResponse {
+	// The file of the permission and its role.
+	message FileRole {
+		// The file ID.
+		string fileID = 1;
+
+		// The role of the file permission.
+		Role role = 2;
+
+		// The creator of the permission.
+		string creator = 3;
+	}
+
+	// Array of files and their role.
+	repeated FileRole permissions = 1;
+
+	// the number of items found as a result.
+	int64 itemCount = 2;
+
+	// The page number requested.
+	int64 pageNum = 3;
+}
+
+message DeleteFilePermissionsRequest {
+	string fileID = 1;
+}
+
+message DeleteFilePermissionsResponse {
+	repeated PermissionObject permissions = 1;
+}
