@@ -3,9 +3,10 @@ services:
   listener-service:
     build: .
     environment:
-      DEBUG_MODE: "true"
-      RABBIT_HOST: "amqp://rabbitmq"
-      MONGO_HOST: "mongodb://mongo1:27017,mongo2:27018,mongo3:27019/devDB?replicaSet=rs0"
+      LSNR_DEBUG_MODE: "true"
+      LSNR_RABBIT_HOST: "amqp://rabbitmq"
+      LSNR_MONGO_HOST: "mongodb://mongo1:27017,mongo2:27018,mongo3:27019/devDB?replicaSet=rs0"
+      ELASTICSEARCH_URL: http://elasticsearch:9200
     ports:
       - 3000:3000
     depends_on:
@@ -51,3 +52,19 @@ services:
       - ./data/mongo-3:/data/db
     ports:
       - 27019:27019
+  elasticsearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.5.0"
+    environment:
+      - discovery.type=single-node
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - "-f"
+        - "http://localhost:9200"
+      interval: 5s
+      timeout: 10s
+      retries: 5
